@@ -1,0 +1,808 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>For Victoria — A Light Kept Since 2018</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500;1,600&family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.js"></script>
+<style>
+  :root{
+    --navy-deep:#131b30;
+    --navy:#1c2a4a;
+    --navy-soft:#26365c;
+    --paper:#f7f0e0;
+    --paper-dim:#ece2c9;
+    --flame:#d9a441;
+    --flame-bright:#f0c165;
+    --rose:#c5798a;
+    --sage:#8faa8b;
+    --slate:#8a97b8;
+    --ink:#211a10;
+    --ink-soft:#5a5240;
+    --line: rgba(217,164,65,0.35);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--navy-deep);
+    color:var(--paper);
+    font-family:'Lora', serif;
+    line-height:1.7;
+    overflow-x:hidden;
+  }
+  h1,h2,h3,.display{
+    font-family:'Playfair Display', serif;
+    font-weight:600;
+    letter-spacing:0.01em;
+  }
+  .mono{
+    font-family:'IBM Plex Mono', monospace;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    font-size:0.72rem;
+  }
+  a{color:var(--flame-bright);}
+
+  /* ---------- ambient candle glow background ---------- */
+  .glow-field{
+    position:fixed;
+    inset:0;
+    z-index:0;
+    pointer-events:none;
+    background:
+      radial-gradient(ellipse 60% 40% at 50% 0%, rgba(217,164,65,0.16), transparent 70%),
+      radial-gradient(ellipse 50% 50% at 85% 20%, rgba(197,121,138,0.08), transparent 70%),
+      radial-gradient(ellipse 50% 50% at 10% 60%, rgba(143,170,139,0.06), transparent 70%);
+  }
+  .stars{
+    position:fixed; inset:0; z-index:0; pointer-events:none;
+  }
+  .star{
+    position:absolute;
+    width:2px;height:2px;
+    background:var(--flame-bright);
+    border-radius:50%;
+    opacity:0.5;
+    animation: twinkle 4s ease-in-out infinite;
+  }
+  @keyframes twinkle{ 0%,100%{opacity:0.15;} 50%{opacity:0.85;} }
+
+  section{position:relative; z-index:1;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height:100vh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:6rem 1.5rem 4rem;
+  }
+  .flame-icon{
+    width:34px; height:52px; margin-bottom:1.6rem;
+    filter: drop-shadow(0 0 14px rgba(240,193,101,0.65));
+  }
+  .hero .mono{ color:var(--flame-bright); margin-bottom:1.1rem; }
+  .hero h1{
+    font-size:clamp(2.4rem, 6vw, 4.6rem);
+    margin:0 0 1rem;
+    color:var(--paper);
+    max-width:16ch;
+  }
+  .hero h1 em{
+    font-style:italic;
+    color:var(--flame-bright);
+  }
+  .hero p.sub{
+    max-width:42ch;
+    color:var(--slate);
+    font-size:1.05rem;
+    margin:0 0 2.2rem;
+  }
+  .hero .years{
+    display:flex; gap:2.4rem; margin-top:1rem;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .hero .years .yr{ text-align:center; }
+  .hero .years .yr .num{ font-size:1.6rem; color:var(--flame-bright); display:block; }
+  .hero .years .yr .lbl{ font-size:0.65rem; letter-spacing:0.1em; text-transform:uppercase; color:var(--slate); }
+  .scroll-cue{
+    position:absolute; bottom:2.2rem; left:50%; transform:translateX(-50%);
+    font-size:0.68rem; color:var(--slate); letter-spacing:0.15em; text-transform:uppercase;
+    display:flex; flex-direction:column; align-items:center; gap:0.5rem;
+  }
+  .scroll-cue::after{
+    content:""; width:1px; height:28px; background:linear-gradient(var(--flame-bright), transparent);
+    animation: drip 1.8s ease-in-out infinite;
+  }
+  @keyframes drip{ 0%{opacity:0.2;} 50%{opacity:1;} 100%{opacity:0.2;} }
+
+  /* ---------- BOOK PAGES ---------- */
+  .book-wrap{
+    padding:5rem 1.5rem 6rem;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  .book-intro{
+    text-align:center; max-width:36ch; margin-bottom:3rem;
+  }
+  .book-intro .mono{ color:var(--flame-bright); display:block; margin-bottom:0.8rem;}
+  .book-intro h2{ font-size:clamp(1.6rem,3.4vw,2.2rem); color:var(--paper); margin:0;}
+
+  .book{
+    display:grid;
+    grid-template-columns:1fr 1fr;
+    max-width:980px;
+    width:100%;
+    background:var(--paper);
+    border-radius:4px;
+    box-shadow:0 40px 90px -30px rgba(0,0,0,0.65), 0 0 0 1px rgba(217,164,65,0.25);
+    overflow:hidden;
+    position:relative;
+  }
+  .book::before{
+    content:"";
+    position:absolute; left:50%; top:0; bottom:0; width:2px;
+    background:linear-gradient(rgba(0,0,0,0.18), rgba(0,0,0,0.05), rgba(0,0,0,0.18));
+    transform:translateX(-1px);
+    z-index:2;
+  }
+  .page{
+    padding:3rem 2.6rem;
+    color:var(--ink);
+    display:flex; flex-direction:column;
+  }
+  .page.left{ background:linear-gradient(90deg, rgba(0,0,0,0.05), transparent 12%); }
+  .page.right{ background:linear-gradient(270deg, rgba(0,0,0,0.05), transparent 12%); }
+  .page .eyebrow{
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.68rem; letter-spacing:0.1em; text-transform:uppercase;
+    color:var(--rose);
+    margin-bottom:1rem;
+  }
+  .page.right .eyebrow{ color:var(--sage); }
+  .page h3{
+    font-size:1.25rem; margin:0 0 1.1rem; color:var(--ink);
+  }
+  .page p.quote{
+    font-style:italic;
+    font-size:1.02rem;
+    color:var(--ink);
+    margin:0 0 1.2rem;
+  }
+  .page p.quote::first-letter{
+    font-family:'Playfair Display', serif;
+    font-size:2.6rem;
+    float:left;
+    line-height:0.8;
+    padding-right:0.14rem;
+    padding-top:0.14rem;
+    color:var(--rose);
+    font-style:normal;
+  }
+  .page.right p.quote::first-letter{ color:var(--sage); }
+  .page .cite{
+    margin-top:auto;
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.72rem;
+    color:var(--ink-soft);
+    letter-spacing:0.03em;
+    border-top:1px solid rgba(0,0,0,0.12);
+    padding-top:0.9rem;
+  }
+
+  @media (max-width:760px){
+    .book{ grid-template-columns:1fr; }
+    .book::before{ display:none; }
+    .page.left{ border-bottom:1px solid rgba(0,0,0,0.1); }
+  }
+
+  /* ---------- TIMELINE ---------- */
+  .timeline-wrap{
+    padding:4rem 1.5rem 6rem;
+    max-width:900px;
+    margin:0 auto;
+  }
+  .tl-intro{ text-align:center; margin-bottom:1rem; }
+  .tl-intro .mono{ color:var(--flame-bright); display:block; margin-bottom:0.8rem; }
+  .tl-intro h2{ font-size:clamp(1.6rem,3.4vw,2.2rem); color:var(--paper); margin:0 0 0.8rem; }
+  .tl-intro p{ color:var(--slate); max-width:44ch; margin:0 auto 1.5rem; font-size:0.98rem; }
+
+  .legend{
+    display:flex; flex-wrap:wrap; gap:1.1rem; justify-content:center; margin-bottom:3.6rem;
+  }
+  .legend span{
+    display:flex; align-items:center; gap:0.5rem;
+    font-family:'IBM Plex Mono', monospace; font-size:0.68rem;
+    letter-spacing:0.06em; text-transform:uppercase; color:var(--slate);
+  }
+  .legend .dot{ width:8px; height:8px; border-radius:50%; }
+
+  .thread{
+    position:relative;
+    padding-left:2.4rem;
+  }
+  .thread::before{
+    content:"";
+    position:absolute; left:7px; top:6px; bottom:6px; width:1px;
+    background:linear-gradient(var(--flame), rgba(217,164,65,0.08));
+  }
+  .moment{
+    position:relative;
+    margin-bottom:3rem;
+    opacity:0;
+    transform:translateY(18px);
+    transition:opacity 0.7s ease, transform 0.7s ease;
+  }
+  .moment.show{ opacity:1; transform:translateY(0); }
+  .moment::before{
+    content:"";
+    position:absolute; left:-2.4rem; top:0.35rem;
+    width:15px; height:15px; border-radius:50%;
+    background:var(--navy-deep);
+    border:2px solid var(--flame);
+    box-shadow:0 0 10px rgba(217,164,65,0.5);
+  }
+  .moment.tag-happy::before{ border-color:var(--flame); box-shadow:0 0 10px rgba(217,164,65,0.6);}
+  .moment.tag-sad::before{ border-color:var(--rose); box-shadow:0 0 10px rgba(197,121,138,0.55);}
+  .moment.tag-misunderstanding::before{ border-color:var(--slate); box-shadow:0 0 10px rgba(138,151,184,0.5);}
+  .moment.tag-growth::before{ border-color:var(--sage); box-shadow:0 0 10px rgba(143,170,139,0.5);}
+
+  .moment .when{
+    font-family:'IBM Plex Mono', monospace; font-size:0.7rem; letter-spacing:0.08em;
+    color:var(--slate); text-transform:uppercase; margin-bottom:0.4rem; display:block;
+  }
+  .moment .tagpill{
+    display:inline-block; font-family:'IBM Plex Mono', monospace; font-size:0.62rem;
+    letter-spacing:0.08em; text-transform:uppercase; padding:0.18rem 0.55rem;
+    border-radius:20px; margin-left:0.6rem; border:1px solid currentColor;
+  }
+  .tag-happy .tagpill{ color:var(--flame-bright); }
+  .tag-sad .tagpill{ color:var(--rose); }
+  .tag-misunderstanding .tagpill{ color:var(--slate); }
+  .tag-growth .tagpill{ color:var(--sage); }
+
+  .moment h3{
+    font-size:1.28rem; margin:0.3rem 0 0.7rem; color:var(--paper);
+  }
+  .moment .card{
+    background:var(--navy-soft);
+    border:1px solid rgba(217,164,65,0.15);
+    border-radius:10px;
+    padding:1.3rem 1.5rem;
+  }
+  .moment p{ margin:0 0 0.8rem; color:#e7dfc9; font-size:0.98rem; }
+  .moment p:last-child{ margin-bottom:0; }
+  .moment blockquote{
+    margin:0.9rem 0 0.9rem 0;
+    padding:0.7rem 1rem;
+    border-left:2px solid var(--flame);
+    font-style:italic;
+    color:var(--paper);
+    background:rgba(217,164,65,0.06);
+    border-radius:0 6px 6px 0;
+    font-size:0.94rem;
+  }
+  .moment blockquote cite{
+    display:block; margin-top:0.4rem; font-style:normal;
+    font-family:'IBM Plex Mono', monospace; font-size:0.66rem; letter-spacing:0.05em;
+    text-transform:uppercase; color:var(--slate);
+  }
+
+  /* ---------- LETTER ---------- */
+  .letter-wrap{
+    padding:5rem 1.5rem 7rem;
+    display:flex; justify-content:center;
+  }
+  .letter{
+    max-width:640px;
+    background:var(--paper);
+    color:var(--ink);
+    border-radius:6px;
+    padding:3.4rem 3rem;
+    box-shadow:0 40px 90px -30px rgba(0,0,0,0.65), 0 0 0 1px rgba(217,164,65,0.25);
+    position:relative;
+  }
+  .letter .mono{ color:var(--rose); display:block; margin-bottom:1.4rem; }
+  .letter h2{
+    font-size:clamp(1.6rem,3.2vw,2.1rem);
+    margin:0 0 1.6rem;
+  }
+  .letter p{ margin:0 0 1.1rem; color:var(--ink); }
+  .letter .sign{
+    margin-top:2rem;
+    font-family:'Playfair Display', serif;
+    font-style:italic;
+    font-size:1.3rem;
+    color:var(--navy);
+  }
+  .letter .ps{
+    margin-top:1.8rem;
+    padding-top:1.4rem;
+    border-top:1px dashed rgba(0,0,0,0.2);
+    font-size:0.9rem;
+    color:var(--ink-soft);
+  }
+
+  .realmsg-wrap{
+    padding:0 1.5rem 6rem;
+    display:flex; flex-direction:column; align-items:center;
+  }
+  .realmsg-intro{ text-align:center; max-width:40ch; margin-bottom:2.2rem; }
+  .realmsg-intro .mono{ color:var(--sage); display:block; margin-bottom:0.8rem; }
+  .realmsg-intro h2{ font-size:clamp(1.4rem,3vw,1.9rem); color:var(--paper); margin:0 0 0.7rem; }
+  .realmsg-intro p{ color:var(--slate); font-size:0.94rem; margin:0; }
+  .bubble{
+    max-width:480px;
+    width:100%;
+    background:#dcf3d1;
+    color:#1c2415;
+    border-radius:14px;
+    border-top-left-radius:2px;
+    padding:1.4rem 1.5rem 1.6rem;
+    box-shadow:0 30px 70px -25px rgba(0,0,0,0.6);
+    font-family:'Lora', serif;
+    position:relative;
+  }
+  .bubble::before{
+    content:"";
+    position:absolute;
+    top:0; left:-9px;
+    width:0; height:0;
+    border-style:solid;
+    border-width:0 10px 10px 0;
+    border-color:transparent #dcf3d1 transparent transparent;
+  }
+  .bubble-head{
+    display:flex; justify-content:space-between; align-items:baseline;
+    margin-bottom:0.8rem;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  .bubble-name{ font-size:0.72rem; color:#3d6b2e; font-weight:600; letter-spacing:0.03em; }
+  .bubble-time{ font-size:0.66rem; color:#5c6b52; }
+  .bubble p{ margin:0 0 0.8rem; font-size:0.98rem; line-height:1.6; }
+  .bubble p:last-child{ margin-bottom:0; }
+
+  footer{
+    text-align:center;
+    padding:3rem 1.5rem 4rem;
+    color:var(--slate);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.68rem;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+  }
+
+  /* ---------- MUSIC TOGGLE ---------- */
+  .music-toggle{
+    position:fixed;
+    top:1.4rem; right:1.4rem;
+    z-index:10;
+    display:flex; align-items:center; gap:0.55rem;
+    background:rgba(19,27,48,0.75);
+    backdrop-filter:blur(8px);
+    border:1px solid rgba(217,164,65,0.35);
+    border-radius:30px;
+    padding:0.5rem 0.95rem 0.5rem 0.6rem;
+    cursor:pointer;
+    color:var(--paper);
+    font-family:'IBM Plex Mono', monospace;
+    font-size:0.66rem;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    transition:border-color 0.3s ease, background 0.3s ease;
+  }
+  .music-toggle:hover{ border-color:var(--flame-bright); }
+  .music-toggle .note-icon{
+    width:26px; height:26px;
+    border-radius:50%;
+    background:var(--flame);
+    display:flex; align-items:center; justify-content:center;
+    flex-shrink:0;
+    position:relative;
+  }
+  .music-toggle .note-icon svg{ width:13px; height:13px; }
+  .music-toggle .bars{
+    display:flex; align-items:flex-end; gap:2px; height:11px;
+  }
+  .music-toggle .bars span{
+    width:2px; background:var(--flame-bright);
+    border-radius:1px;
+    height:4px;
+    opacity:0.35;
+  }
+  .music-toggle.playing .bars span{
+    animation: eq 0.9s ease-in-out infinite;
+    opacity:1;
+  }
+  .music-toggle .bars span:nth-child(1){ animation-delay:0s; }
+  .music-toggle .bars span:nth-child(2){ animation-delay:0.2s; }
+  .music-toggle .bars span:nth-child(3){ animation-delay:0.4s; }
+  @keyframes eq{
+    0%,100%{ height:4px; }
+    50%{ height:11px; }
+  }
+  @media (max-width:600px){
+    .music-toggle{ top:0.9rem; right:0.9rem; padding:0.42rem 0.8rem 0.42rem 0.5rem; }
+    .music-toggle .label{ display:none; }
+  }
+
+  @media (max-width:600px){
+    .letter{ padding:2.4rem 1.6rem; }
+    .page{ padding:2.2rem 1.6rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation:none !important; transition:none !important; }
+    .moment{ opacity:1; transform:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="glow-field"></div>
+<div class="stars" id="stars"></div>
+
+<button class="music-toggle" id="musicToggle" aria-label="Play background music">
+  <span class="note-icon">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M9 18V5l11-2v13" stroke="#131b30" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      <circle cx="6" cy="18" r="3" stroke="#131b30" stroke-width="1.8"/>
+      <circle cx="17" cy="16" r="3" stroke="#131b30" stroke-width="1.8"/>
+    </svg>
+  </span>
+  <span class="bars"><span></span><span></span><span></span></span>
+  <span class="label" id="musicLabel">play music</span>
+</button>
+
+<!-- ================= HERO ================= -->
+<section class="hero">
+  <svg class="flame-icon" viewBox="0 0 34 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <path d="M17 0C17 0 6 14 6 27C6 37.4 10.5 44.5 17 44.5C23.5 44.5 28 37.4 28 27C28 14 17 0 17 0Z" fill="url(#g1)"/>
+    <path d="M17 12C17 12 12 20 12 28C12 33.5 14 37 17 37C20 37 22 33.5 22 28C22 20 17 12 17 12Z" fill="#fff3d6" opacity="0.85"/>
+    <rect x="15" y="44" width="4" height="8" rx="1.5" fill="#3a2c1a"/>
+    <defs>
+      <linearGradient id="g1" x1="17" y1="0" x2="17" y2="44.5" gradientUnits="userSpaceOnUse">
+        <stop stop-color="#f0c165"/>
+        <stop offset="1" stop-color="#d9a441"/>
+      </linearGradient>
+    </defs>
+  </svg>
+  <span class="mono">18 · july · a friendship since 2018</span>
+  <h1>A light kept<br><em>since 2018,</em><br>for Victoria</h1>
+  <p class="sub">Corn promised on the road to Agbara, devotionals read at midnight, mistakes forgiven fast, and a friendship that never once stopped praying — this is only the part of it the messages could catch.</p>
+  <div class="years">
+    <div class="yr"><span class="num">2018</span><span class="lbl">Where it began</span></div>
+    <div class="yr"><span class="num">→</span><span class="lbl"></span></div>
+    <div class="yr"><span class="num">24</span><span class="lbl">Today, you turn</span></div>
+  </div>
+  <div class="scroll-cue">read on</div>
+</section>
+
+<!-- ================= BOOK PAGES ================= -->
+<section class="book-wrap">
+  <div class="book-intro">
+    <span class="mono">Before the story — two pages you've always loved</span>
+    <h2>The words that walked beside us</h2>
+  </div>
+  <div class="book">
+    <div class="page left">
+      <span class="eyebrow">Finishing Strong · Steve Farrar</span>
+      <h3>On running the whole race</h3>
+      <p class="quote">So many begin the race well — full of fire, full of promise — and then, one by one, they fall away before the finish. What marks a life is not how brightly it started, but whether it is still standing, still faithful, still walking with God when the finish line finally comes into view. The few who finish strong are not the most gifted; they are the ones who kept showing up, kept choosing faithfulness in the small, unseen hours, long after applause had gone quiet.</p>
+      <p class="cite">The book Victoria has been urged to finish reading — the paragraph that stayed.</p>
+    </div>
+    <div class="page right">
+      <span class="eyebrow">The Pilgrim's Progress · John Bunyan, 1684</span>
+      <h3>For a fearless woman</h3>
+      <p class="quote">Then said he, I am going to my Father's; and though with great difficulty I have got hither, yet now I do not repent me of all the trouble I have been at to arrive where I am. My sword I give to him that shall succeed me in my pilgrimage, and my courage and skill to him that can get it. My marks and scars I carry with me, to be a witness for me that I have fought His battles who will now be my rewarder. So he passed over, and all the trumpets sounded for him on the other side.</p>
+      <p class="cite">Fearless. Valiant-for-truth. Victoria, all the way through.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ================= TIMELINE ================= -->
+<section class="timeline-wrap">
+  <div class="tl-intro">
+    <span class="mono">The journey, in her own late-night messages</span>
+    <h2>Five years, one thread of light</h2>
+    <p>Every dot below is a real moment — pulled from thousands of messages sent at every hour, mostly past midnight. Some make you smile. Some still ache a little. All of them are yours.</p>
+  </div>
+
+  <div class="legend">
+    <span><span class="dot" style="background:var(--flame)"></span>Happy</span>
+    <span><span class="dot" style="background:var(--rose)"></span>Sad / Tender</span>
+    <span><span class="dot" style="background:var(--slate)"></span>Misunderstanding</span>
+    <span><span class="dot" style="background:var(--sage)"></span>Growth</span>
+  </div>
+
+  <div class="thread">
+
+    <div class="moment tag-happy">
+      <span class="when">2018</span><span class="tagpill">happy</span>
+      <h3>Where the story actually starts</h3>
+      <div class="card">
+        <p>Before any of these messages, before the timestamps and the devotionals, there was 2018 — the year this friendship began. The chat picks up two years in, already deep, already sure of itself. Everything below is a continuation, not a beginning.</p>
+      </div>
+    </div>
+
+    <div class="moment tag-sad">
+      <span class="when">October 2020</span><span class="tagpill">sad · tender</span>
+      <h3>Steady, in a hard season</h3>
+      <div class="card">
+        <p>By the time the messages pick up, this friendship was already two years deep — steady enough to hold a frightening season without flinching. A hard year, friends lost, uncertainty everywhere, and still this:</p>
+        <blockquote>"May God be with you, do not allow the situation weigh you down, or make you dismay. God has promised, He's able to perform. Let's hold on to heaven's promises and shut out the dismal information."<cite>22 Oct 2020, 15:04</cite></blockquote>
+        <p>Victoria's reply was one word, but it was everything: <em>"AMEN."</em> That single word became the rhythm of the years that followed.</p>
+      </div>
+    </div>
+
+    <div class="moment tag-happy">
+      <span class="when">24 October 2020</span><span class="tagpill">happy</span>
+      <h3>"There's only one Victoria"</h3>
+      <div class="card">
+        <p>A message that has never once been taken back:</p>
+        <blockquote>"There's only one Victoria, that's my Victoria... I'm lucky to have her as a friend. May God keep her for her generation. She's a fearless person. We've fought too, very well. I don't fear her."<cite>24 Oct 2020, 00:05</cite></blockquote>
+        <p>Fearless. That word would follow her through everything that came next.</p>
+      </div>
+    </div>
+
+    <div class="moment tag-misunderstanding">
+      <span class="when">24 September 2021</span><span class="tagpill">misunderstanding</span>
+      <h3>The charger, and the "number one stressor"</h3>
+      <div class="card">
+        <p>A small mix-up over a phone charger — wrong cable, wrong colour, a joke about crying over it — tipped into something more honest. Victoria, only half-teasing, told him exactly what she thought.</p>
+        <blockquote>"You're the number one stressor in my life...."<cite>Victoria, 24 Sept 2021</cite></blockquote>
+        <p>Isaac didn't laugh it off. He sat with it, and answered with a rare kind of honesty:</p>
+        <blockquote>"When I look back to that faithful day we first talked up till now, it's obvious that I'm really a huge stress contributor... Please, I'm sorry. Aside that, that's why most times I don't want to get involved, I fear that I'll cause you nothing but trouble. But abba, God is on the throne... if he wills, the talk we had that day will soon be history, and if he wills, it will be historic."<cite>24 Sept 2021, 21:19</cite></blockquote>
+        <p>By the next line she was calling him "old man" again. Some misunderstandings are just love, learning to be more careful with itself.</p>
+      </div>
+    </div>
+
+    <div class="moment tag-sad">
+      <span class="when">14 September 2023</span><span class="tagpill">sad · tender</span>
+      <h3>Sung to, over the phone, while sick</h3>
+      <div class="card">
+        <p>Some memories only surface when you're reminiscing out loud. This one came up on an ordinary Thursday night — Victoria remembering a season she'd almost forgotten she survived.</p>
+        <blockquote>"When I think of your IT, I remember you singing hymns and praying for me over the phone while I was sick. Kai! You spent airtime."<cite>14 Sept 2023, 22:15</cite></blockquote>
+        <p>She was quick to redirect the credit, the way she always does: <em>"Whatever you think I've done, know that it's Jesus who did it."</em> But the hymns were real, and so was the phone bill.</p>
+      </div>
+    </div>
+
+    <div class="moment tag-happy">
+      <span class="when">27 November 2024</span><span class="tagpill">happy</span>
+      <h3>Brainsworth, and a prayer bigger than the job</h3>
+      <div class="card">
+        <p>The morning she resumed at a new place, the congratulations that came back weren't just polite.</p>
+        <blockquote>"Congratulations. I pray God uses this to grant you genuine clarity, peace and hope for all the beautiful things He has ahead. We bless God for this provision... may He make you a light in that environment."<cite>27 Nov 2024, 9:51 am</cite></blockquote>
+        <p>And then, so she'd never mistake it for routine well-wishing:</p>
+        <blockquote>"You know I am happy for you. And I know you have much more to offer... Congrats my friend. Glory be to God."<cite>27 Nov 2024, 9:59 am</cite></blockquote>
+      </div>
+    </div>
+
+    <div class="moment tag-misunderstanding">
+      <span class="when">25 February 2025</span><span class="tagpill">misunderstanding</span>
+      <h3>The apology for a vague answer</h3>
+      <div class="card">
+        <p>She had called the day before, worried, asking about something important. The answer she got back was thin — and Isaac knew it the moment he sent it.</p>
+        <blockquote>"I owe you an apology. Yesterday, you made an effort to call me to ask about very important happenings. I do not take that for granted. However, I gave very vague responses. You didn't deserve that, and I shouldn't have done so."<cite>25 Feb 2025, 12:06 pm</cite></blockquote>
+        <p>No excuse offered, just an honest one: <em>"What warranted my actions, nothing but selfishness maybe, an inability to own up, and an unnecessary fear."</em> By 3:30 that afternoon she was already asking to talk again — the kind of friendship where an honest apology closes the gap fast.</p>
+      </div>
+    </div>
+
+    <div class="moment tag-happy">
+      <span class="when">20 March 2025</span><span class="tagpill">happy · growth</span>
+      <h3>Convocation, done and dusted</h3>
+      <div class="card">
+        <p>Between a lost phone, a brother's hospital scare, and certificate collection stress, convocation finally arrived.</p>
+        <blockquote>"We anticipate more sha... I understand that you have been very overwhelmed with many things, but thank God, it has been victory after another. Your convocation, collection of cert, found your phone, your brother's health — and so many other matters."<cite>20 Mar 2025, 3:45 pm</cite></blockquote>
+        <p>Her reply was quiet and true: <em>"Thank you for reminding me to count my blessings."</em></p>
+      </div>
+    </div>
+
+    <div class="moment tag-growth">
+      <span class="when">2018 → 2025</span><span class="tagpill">growth</span>
+      <h3>"How's the French?" to "You will be corresponding with Francophone countries"</h3>
+      <div class="card">
+        <p>In their very first week of talking, Isaac was already asking about her French — a small, ordinary question. Five years of "oui," "merci beaucoup," and "je suis ici" later, that ordinary question became a calling.</p>
+        <blockquote>"We need a french interpreter for our mancom meeting tonight... don't worry, be like that digital work you're doing with Zicounsels is too small. Na Francophone countries you will be corresponding with."<cite>23 Aug 2025, 16:30</cite></blockquote>
+        <p>Watching someone's small, patient habit become their calling — that's a particular kind of joy only a friend of many years gets to witness.</p>
+      </div>
+    </div>
+
+    <div class="moment tag-happy">
+      <span class="when">11 July 2025</span><span class="tagpill">happy</span>
+      <h3>The birthday cake that shouldn't have been possible</h3>
+      <div class="card">
+        <p>One birthday, there was nothing on ground and only two days left. So they prayed instead of panicked.</p>
+        <blockquote>"We prayed. There was actually nothing on ground, with just about two days left. Then we told God, if He would love us to celebrate the birthday, He should provide what was needed. And God did just that — provided the money at the nick of time, provided someone who will bake it in just over a day..."<cite>11 July 2025, 13:37</cite></blockquote>
+        <p>Victoria's reply is the whole reason this page exists:</p>
+        <blockquote>"I wasn't expecting it. It made me happy. It made me feel loved. Thank you. I do not need a repeat. I know I'm loved."<cite>Victoria, 11 July 2025</cite></blockquote>
+      </div>
+    </div>
+
+    <div class="moment tag-happy">
+      <span class="when">18 July 2025</span><span class="tagpill">happy</span>
+      <h3>Turning 23 — witnessed, on purpose</h3>
+      <div class="card">
+        <p>Last year, less than two hours before midnight, Isaac made sure she knew she was seen.</p>
+        <blockquote>"I am grateful to witness this birthday with you, just less than 2 hours — we should really thank God."<cite>17 July 2025, 22:17</cite></blockquote>
+        <p>And at 7:59 the next morning, right on time: <em>"Happy Birthday......."</em> Her reply, hours later, still holds: <em>"Thank you very much, Isaac. Thank you, thank you, thank you."</em></p>
+      </div>
+    </div>
+
+    <div class="moment tag-growth">
+      <span class="when">9 September 2025</span><span class="tagpill">growth</span>
+      <h3>"I realised how much gratitude I owe"</h3>
+      <div class="card">
+        <p>Mid-way through a Bible reading plan they'd been holding each other to, an ordinary morning turned into a reckoning.</p>
+        <blockquote>"Through God's help I realised how much gratitude I owe for the genuine friendship you have extended to me and to others through the years. It's not easy to find one so thoughtful and truthful."<cite>9 Sept 2025, 7:09 am</cite></blockquote>
+        <p>He'd already taken to calling her <em>Dear Recaptian</em> that week — for never leaving a skipped passage unfinished. Some nicknames are just the truth, dressed lightly.</p>
+      </div>
+    </div>
+
+    <div class="moment tag-sad">
+      <span class="when">25 November 2025</span><span class="tagpill">sad · tender</span>
+      <h3>A hospital day, and a walkie-talkie rescue</h3>
+      <div class="card">
+        <p>Referred from one clinic to another, tired, telling him plainly not to bother coming — and he came anyway.</p>
+        <blockquote>"Do you copy? ... Mid terminal and leg bridge. Where those hunch back buses take Mile 2 / Orile."<cite>25 Nov 2025, 5:22–5:25 pm</cite></blockquote>
+        <p>She found him. Ten minutes later: <em>"Mr. Kangaroo. Thank you."</em> Some care doesn't announce itself — it just shows up at a bus terminal and waits.</p>
+      </div>
+    </div>
+
+    <div class="moment tag-sad">
+      <span class="when">24 May 2026</span><span class="tagpill">sad · tender</span>
+      <h3>Her aunt's accident</h3>
+      <div class="card">
+        <p>He noticed her absence from church before she said a word about why.</p>
+        <blockquote>"I didn't see you in church today, I asked Paul and he told me what happened! So sorry about the accident... May God send healing to your aunt, and give her the strength to recover quickly."<cite>24 May 2026, 9:16 pm</cite></blockquote>
+        <p>Her answer, the very same evening, was the answer she almost always gives: <em>"She is very much better. Thank God for the victory."</em> Grace under pressure, every time.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ================= LETTER ================= -->
+<section class="letter-wrap">
+  <div class="letter">
+    <span class="mono">18 July 2026 — this year's letter</span>
+    <h2>Happy birthday, Oluwaronke Victoria.</h2>
+    <p>Twenty-four. And I want you to know this letter isn't the first time I've tried to say this — just the first time I've put it all in one place. I went back through years of messages to find the moments I meant the most, so you'd know this isn't something an app wrote for you. It's mine.</p>
+    <p>Back in January 2022, I told you:</p>
+    <blockquote>"Thank you for the Amazing Friendship and companionship through my university days, now I know I had the best."<cite>6 Jan 2022, 20:09</cite></blockquote>
+    <p>That Christmas, I tried again, longer, because one line was never going to be enough:</p>
+    <blockquote>"You've been a huge blessing to me, I thank God for bringing our paths to smash each other."<cite>25 Dec 2022, 21:48</cite></blockquote>
+    <p>And more recently, on an ordinary Thursday morning, I said it plainer than I ever had:</p>
+    <blockquote>"I am not your God or your lover, but you mean so much to me, and I do cherish you and the friendship."<cite>20 Mar 2025, 09:31</cite></blockquote>
+    <p>All of that is still true today, maybe truer. You've forgiven fast, been forgiven fast, learned a language nobody made you learn, stayed valiant through things you never asked to be praised for, and been the friend who prays first and explains later. No vex — but I don't think you know how rare that is.</p>
+    <p><em>So may God keep you for your generation. May He honour every quiet, unseen faithfulness the way He always has. And may this year be one where you feel — the way you did over that cake — unmistakably, thoroughly loved.</em></p>
+    <p class="sign">With gratitude that keeps growing,<br>Isaac</p>
+    <p class="ps">P.S. — Somebody still owes you corn from Lusada. Roasted, not boiled.</p>
+  </div>
+</section>
+
+<!-- ================= REAL MESSAGE ================= -->
+<section class="realmsg-wrap">
+  <div class="realmsg-intro">
+    <span class="mono">Not curated. Not written for this page.</span>
+    <h2>What he actually sent you, this morning</h2>
+    <p>Everything above was gathered and arranged. This wasn't. It's the message as it left his phone at 1:09 am today.</p>
+  </div>
+  <div class="bubble">
+    <div class="bubble-head">
+      <span class="bubble-name">lawalisaac</span>
+      <span class="bubble-time">18/07/2026, 1:09 am</span>
+    </div>
+    <p><strong>Happy Birthday... 24 looks good on you.</strong> 💐</p>
+    <p>You've come a long way and God who has brought you here, this far, will keep you, keep you, from the evil, the ugly the bad, the unkind, the unsolicited. May HE bring you to good men, better men, better friends, and someday, if He wills, to your better half.</p>
+    <p>Thanks for being here. Thanks!!!</p>
+    <p>Happy Birthday Victoria 🥳🎂🎉</p>
+  </div>
+</section>
+
+<footer>a letter for victoria · curated from years of conversation, across both our phones · 18 july</footer>
+
+<script>
+  // ambient stars
+  const starsField = document.getElementById('stars');
+  const starCount = window.innerWidth < 700 ? 30 : 60;
+  for(let i=0;i<starCount;i++){
+    const s = document.createElement('div');
+    s.className='star';
+    s.style.left = Math.random()*100+'vw';
+    s.style.top = Math.random()*100+'vh';
+    s.style.animationDelay = (Math.random()*4)+'s';
+    starsField.appendChild(s);
+  }
+
+  // reveal timeline moments on scroll
+  const moments = document.querySelectorAll('.moment');
+  const io = new IntersectionObserver((entries)=>{
+    entries.forEach(e=>{
+      if(e.isIntersecting){
+        e.target.classList.add('show');
+        io.unobserve(e.target);
+      }
+    });
+  }, {threshold:0.15});
+  moments.forEach(m=>io.observe(m));
+
+  // ---------- gentle generative background music ----------
+  // A soft, original ambient pad + slow bell melody — candlelight, not copyrighted.
+  let musicStarted = false;
+  let isPlaying = false;
+  let padSynth, bellSynth, padLoop, bellLoop, reverb, filter;
+
+  function buildMusic(){
+    reverb = new Tone.Reverb({ decay: 8, wet: 0.55 }).toDestination();
+    filter = new Tone.Filter(1800, "lowpass").connect(reverb);
+
+    padSynth = new Tone.PolySynth(Tone.Synth, {
+      oscillator: { type: "sine" },
+      envelope: { attack: 2.2, decay: 1, sustain: 0.6, release: 4 }
+    }).connect(filter);
+    padSynth.volume.value = -18;
+
+    bellSynth = new Tone.FMSynth({
+      harmonicity: 3, modulationIndex: 4,
+      envelope: { attack: 0.02, decay: 1.2, sustain: 0.1, release: 2.5 },
+      modulationEnvelope: { attack: 0.02, decay: 0.3, sustain: 0, release: 0.5 }
+    }).connect(reverb);
+    bellSynth.volume.value = -22;
+
+    // slow, warm chord progression (Dmaj9 - Bm7 - Gmaj7 - A9), evoking a hymn at night
+    const chords = [
+      ["D4","F#4","A4","C#5"],
+      ["B3","D4","F#4","A4"],
+      ["G3","B3","D4","F#4"],
+      ["A3","C#4","E4","G4"]
+    ];
+    let chordIndex = 0;
+    padLoop = new Tone.Loop((time)=>{
+      padSynth.triggerAttackRelease(chords[chordIndex % chords.length], "6n", time);
+      chordIndex++;
+    }, "2m").start(0);
+
+    // sparse bell notes drifting over the top
+    const bellNotes = ["D5","A5","F#5","E5","C#5","G5"];
+    bellLoop = new Tone.Loop((time)=>{
+      if(Math.random() > 0.45){
+        const note = bellNotes[Math.floor(Math.random()*bellNotes.length)];
+        bellSynth.triggerAttackRelease(note, "2n", time);
+      }
+    }, "1m").start("2m");
+
+    Tone.Transport.bpm.value = 58;
+  }
+
+  const toggleBtn = document.getElementById('musicToggle');
+  const musicLabel = document.getElementById('musicLabel');
+
+  toggleBtn.addEventListener('click', async ()=>{
+    if(!musicStarted){
+      await Tone.start();
+      buildMusic();
+      Tone.Transport.start();
+      musicStarted = true;
+      isPlaying = true;
+    } else {
+      if(isPlaying){
+        Tone.Transport.pause();
+        isPlaying = false;
+      } else {
+        Tone.Transport.start();
+        isPlaying = true;
+      }
+    }
+    toggleBtn.classList.toggle('playing', isPlaying);
+    musicLabel.textContent = isPlaying ? 'pause music' : 'play music';
+  });
+</script>
+
+</body>
+</html>
